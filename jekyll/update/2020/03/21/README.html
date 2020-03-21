@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>READMEll! | p4-t2-networking-alu0101120645</title>
+<meta name="generator" content="Jekyll v4.0.0" />
+<meta property="og:title" content="READMEll!" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Práctica 6 - Networking." />
+<meta property="og:description" content="Práctica 6 - Networking." />
+<link rel="canonical" href="/jekyll/update/2020/03/21/README.html" />
+<meta property="og:url" content="/jekyll/update/2020/03/21/README.html" />
+<meta property="og:site_name" content="p4-t2-networking-alu0101120645" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-03-21T18:15:00+00:00" />
+<script type="application/ld+json">
+{"headline":"READMEll!","dateModified":"2020-03-21T18:15:00+00:00","datePublished":"2020-03-21T18:15:00+00:00","description":"Práctica 6 - Networking.","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll/update/2020/03/21/README.html"},"@type":"BlogPosting","url":"/jekyll/update/2020/03/21/README.html","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="p4-t2-networking-alu0101120645" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">p4-t2-networking-alu0101120645</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">READMEll!</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2020-03-21T18:15:00+00:00" itemprop="datePublished">Mar 21, 2020
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="práctica-6---networking">Práctica 6 - Networking.</h2>
+
+<p>Los servicios de red tienen dos objetivos: conectar dos puntos y transmitir informacion entre ellos.</p>
+
+<p>No importa que tipo de información estemos transmitiendo, siempre deberemos hacer una conexión primero.</p>
+
+<h2 id="enlace-de-un-servidor-a-un-puerto-tcp">Enlace de un servidor a un puerto <code class="highlighter-rouge">TCP</code>.</h2>
+
+<p>La conexión de un <code class="highlighter-rouge">Socket TCP</code> consiste en dos puntos finales. Un punto final se une a un puerto numerado mientras que el otro se conecta a un puerto.</p>
+
+<p>Esto funciona como en los sistemas telefónicos.</p>
+
+<p>En Node las operaciones de enlace y conexión son proporcionadas por el módulo <code class="highlighter-rouge">net</code>.</p>
+
+<pre><code class="language-Javascript">
+'use strict';
+const
+net = require('net'),
+server= net.createServer(connection =&gt; {
+
+});
+server.listen(60300);
+
+</code></pre>
+
+<p>El método <code class="highlighter-rouge">net.createServer</code> coge una <code class="highlighter-rouge">callback</code> y devuelve un objeto servidor. La <code class="highlighter-rouge">callback</code> se invoca cuando se conecta otro punto. El parámetro de conexión es un objecto <code class="highlighter-rouge">Socket</code> que se puede usar para enviar y recibir datos.</p>
+
+<p>El método <code class="highlighter-rouge">server.listen</code> nos permite escuchar por el puerto indicado.</p>
+
+<p><img src="/capturas/captura_1.png" alt="esquema" /></p>
+
+<h2 id="escribir-datos-en-un-socket">Escribir datos en un Socket.</h2>
+
+<pre><code class="language-Javascript">'use strict'
+
+const fs = require('fs');
+const net = require('net');
+const filename = process.argv[2];
+/* Comprobamos que se introdujo nombre de fichero*/
+if(!filename) {
+  throw Error('Error: No filename specified.');
+}
+/* Establecemos la conexion y escuchamos por el puerto indicado*/
+net.createServer( connection =&gt; {
+  //Reporting.
+  console.log('Subscriber connected.');
+  connection.write(`Now watching "${filename}" for changes...\n`);
+
+  //watcher setup.
+  const watcher = 
+    fs.watch(filename, () =&gt; connection.write(`File changed: ${new Date()}\n`));
+
+  //Cleanup.
+  connection.on('close', () =&gt; {
+    console.log('Subscriber disconnected.');
+    watcher.close();
+  });
+}).listen(60300, () =&gt; console.log('Listening for subscribers...'));
+</code></pre>
+
+<p>Ecribimos este código con el nombre <code class="highlighter-rouge">net-watcher.js</code>. Como podemos ver le pasamos el nombre del fichero a observar como argumento. En caso de que el usuario no proporcione ninguno devolveremos un error personalizado.</p>
+
+<p>Con el método <code class="highlighter-rouge">connection.write</code> podemos escribir en el cliente y con <code class="highlighter-rouge">watcher.close</code> cerramos la conexión.</p>
+
+<p>Invocamos <code class="highlighter-rouge">server.listen</code> cuando se enlaza correctamente con el puerto especificado y esta listo para recibir conexiones.</p>
+
+<h2 id="conexión-a-un-servidor-socket-tcp-con-netcat">Conexión a un servidor Socket TCP con Netcat.</h2>
+
+<p>Para probar el fichero <code class="highlighter-rouge">net-watcher.js</code> necesitamos 3 terminales:</p>
+
+<ul>
+  <li>Una de servidor.</li>
+  <li>Una de cliente.</li>
+  <li>Una para los cambios en el fichero.</li>
+</ul>
+
+<p>En una terminal usaremos el comando <code class="highlighter-rouge">watch -n 1 touch target.txt</code> para   modificar el fichero cada segundo.</p>
+
+<p>En la segunda terminal ejecutaremos el servidor <code class="highlighter-rouge">node net-watcher.js target.txt</code>.
+Por último, en una tercera terminal, usaremos Netcat para conectarnos. Usaremos <code class="highlighter-rouge">nc localhost 60300</code>. Netcat es un programa de utilidad de Socket.</p>
+
+<p><img src="/capturas/captura_conexion.png" alt="ejecucion1" /></p>
+
+<p>Un esquema detallado de lo que sucede sería el siguiente.</p>
+
+<p><img src="/capturas/captura_2.png" alt="esquema2" /></p>
+
+<h2 id="escuchando-en-sockets-unix">Escuchando en Sockets Unix.</h2>
+
+<p>Para ver como funciona <code class="highlighter-rouge">net</code> en los sockets Unix modificamos el programa anterior .</p>
+
+<p>Cambiamos el listen final por <code class="highlighter-rouge">listen(‘/tmp/watcher.sock’, () =&gt; console.log(‘Listening for subscribers...’));</code>.</p>
+
+<p>Este archivo lo guardamos como <code class="highlighter-rouge">net-watcher-unix.js</code>.</p>
+
+<p><code class="highlighter-rouge">NOTA: si se recibe un error EADDRINUSE debe eliminar el watcher.sock antes de ejecutar el programa de nuevo.</code></p>
+
+<p>La ejecución será igual que la anterior pero al <code class="highlighter-rouge">nc</code> le añadiremos la opción <code class="highlighter-rouge">-U</code> seguido de <code class="highlighter-rouge">/tmp/watcher.sock</code>.</p>
+
+<p>Los sockets Unix pueden ser más rápidos que los sockets TCP porque no requieren invocar al hardware de red.</p>
+
+<h2 id="implementando-un-protocolo-de-mensajería">Implementando un protocolo de mensajería.</h2>
+
+<p>Un protocolo es un conjunto de reglas que definen como se comunican los puntos en un sistema. En <code class="highlighter-rouge">Node</code> estaremos trabajando con uno o más protocolos. Vamos a crear  un protocolo basado en pasar mensajes <code class="highlighter-rouge">JSON</code> a través de <code class="highlighter-rouge">TCP</code>.</p>
+
+<h2 id="serialización-de-mensajes-con-json">Serialización de mensajes con JSON.</h2>
+
+<p>Cada mensaje será un objeto serializado JSON.  Basicamente es un hash clave - valor.</p>
+
+<p><code class="highlighter-rouge">{“key: “value”, “anotherKey”: “anotherValue”}</code></p>
+
+<p>El servicio <code class="highlighter-rouge">net-watcher</code> que hemos creado envía dos tipos de mensajes que necesitamos convertir a  JSON:</p>
+
+<ul>
+  <li>Cuando la conexión se establece por primera vez.</li>
+  <li>Cuando el fichero se modifica.</li>
+</ul>
+
+<p>Podemos codificar el primer tipo de la siguiente manera:</p>
+
+<p><code class="highlighter-rouge">{“type”: “watching”, “file”: “target.txt”}</code></p>
+
+<p>Y el segundo de la siguiente:</p>
+
+<p><code class="highlighter-rouge">{“type”: “changed”, “timestamp”: 1358175733785}</code>
+El campo <code class="highlighter-rouge">timestamp</code> contiene un valor entero que representa el número de milisegundos desde la medianoche del 1 de enero de 1970. Podemos obtener la fecha actual con <code class="highlighter-rouge">Date.now</code>.</p>
+
+<p>Destacar que no usamos saltos de linea en nuestro mensaje JSON. Utilizamos en este caso los saltos de linea para separar los mensajes. Esto sería JSON delimitado por lineas (LDJ).</p>
+
+<h2 id="cambiando-a-mensajes-json">Cambiando a mensajes JSON.</h2>
+
+<p>A continuación modificamos el servicio <code class="highlighter-rouge">net-watcher</code> para emplear el protocolo que hemos definido.</p>
+
+<p>Nuestra tarea es usar <code class="highlighter-rouge">JSON.stringify</code> para codificar objectos de mensaje y enviarlos mediante <code class="highlighter-rouge">connection.write</code>. Con <code class="highlighter-rouge">JSON.stringify</code> lo que hacemos es coger un objeto JavaScript y devolver un string en forma de JSON.</p>
+
+<p>Lo que haremos es modificar el <code class="highlighter-rouge">connection.write</code>.</p>
+<pre><code class="language-Javascript">'use strict'
+
+const fs = require('fs');
+const net = require('net');
+const filename = process.argv[2];
+
+/* Comprobamos que se introdujo nombre de fichero*/
+if(!filename) {
+  throw Error('Error: No filename specified.');
+}
+
+/*Establecemos la conexion y escuchamos por el puerto indicado*/
+net.createServer( connection =&gt; {
+  //Reporting.
+  console.log('Subscriber connected.');
+  connection.write(JSON.stringify({type: 'watching', file: filename}) + '\n');
+
+  //watcher setup.
+  const watcher = fs.watch(filename, () =&gt; connection.write(
+    JSON.stringify({type: 'changed', timestamp: Date.now()}) + '\n'));
+
+  //Cleanup.
+  connection.on('close', () =&gt; {
+    console.log('Subscriber disconnected.');
+    watcher.close();
+  });
+}).listen(60300, () =&gt; console.log('Listening for subscribers...'))
+
+</code></pre>
+
+<p>Ahora ejecutamos el nuevo archivo guardado como <code class="highlighter-rouge">net-watcher-json-service.js</code></p>
+
+<p><img src="/capturas/captura_cambio.png" alt="server-json" /></p>
+
+<h2 id="creación-de-cliente-de-conexiones-sockets">Creación de cliente de conexiones sockets.</h2>
+
+<pre><code class="language-Javascript">'use strict'
+
+const net = require('net');
+const client = net.connect({port: 60300});
+
+/*Conectamos por el puerto indicado y en caso de recibir datos los procesamos*/
+client.on('data', data =&gt; {
+  const message = JSON.parse(data);
+  if(message.type === 'watching') {
+    console.log(`Now watching: ${message.file}`);
+  } else if (message.type === 'changed') {
+    const date = new Date(message.timestamp);
+    console.log(`File changed: ${date}`);
+  } else {
+    console.log(`Unrecognized message type: ${message.type}`);
+  }
+});
+</code></pre>
+
+<p>Este programa es un pequeño cliente que utiliza <code class="highlighter-rouge">net.connect</code> para crear una conexión cliente en el puerto especificado del localhost. Cuando llega algún dato es analizado y se muestra adecuadamente por consola, hasta ahra no hemos tenido en cuenta el manejo de errores.</p>
+
+<h2 id="problema-del-límite-de-mensajes">Problema del límite de mensajes.</h2>
+
+<p>En el mejor de los casos los mensajes llegarán a la vez. El problema es que a veces llegaran en diferentes pedazos de datos. Necesitamos lidiar con este problema cuando ocurra.</p>
+
+<p>El protocolo LDJ que desarrollamos anteriormente separa los mensajes con nuevas lineas.</p>
+
+<p>Si llegara un mensaje separado llegaria como dos datos. Quedaría algo así:</p>
+
+<p><img src="/capturas/captura_3.png" alt="split-message" /></p>
+
+<h2 id="implementando-un-servicio-de-pruebas">Implementando un servicio de pruebas.</h2>
+
+<p>Implementaremos un servicio de pruebas que divide a propósito un mensaje en múltiples partes.</p>
+
+<pre><code class="language-Javascript">'use strict';
+
+const server = require('net').createServer(connection =&gt; {
+  console.log('Subscriber connected.');
+
+  //Two message chunks that together make a whole message.
+  const firstChunk = '{"type": "changed", "timesta';
+  const secondChunk = 'mp": 1450694370094}\n';
+
+  //Send the first chunk inmeditely.
+  connection.write(firstChunk);
+
+  //After a short delay, send the other chunk.
+  const timer = setTimeout(() =&gt; {
+    connection.write(secondChunk);
+    connection.end();
+  }, 100);
+
+  //Clear timer when the connection ends.
+  connection.on('end', () =&gt; {
+    clearTimeout(timer);
+    console.log('Subscriber disconnected.');
+  });
+});
+
+server.listen(60300, function() {
+  console.log('Test server listening for subscribers...');
+});
+</code></pre>
+
+<p>Una vez guardado ejecutamos y comprobamos el error de que solo recibe en primer lugar un fragmento del mensaje. Como ya comentamos lo que hace es parsear el mensaje que le llega y como solo coge lo primero que le llegó salta el error al estar incompleto.</p>
+
+<p><img src="/capturas/captura_error_split.png" alt="error-client" /></p>
+
+<h2 id="creación-de-módulos-personalizados">Creación de módulos personalizados.</h2>
+
+<p>El programa cliente tiene dos tareas que hacer. Una es almacenar los datos entrantes en mensajes. La otra es manejar cada mensaje cuando llega.</p>
+
+<p>En lugar de agrupar estos dos trabajos en un solo programa, lo correcto es convertir al menos uno de ellos en un módulo.</p>
+
+<h2 id="extender-eventemitter">Extender EventEmitter.</h2>
+
+<p>Para liberar al programa cliente del peligro de dividir los mensajes JSON, implementaremos un módulo de cliente de buffer LDJ.</p>
+
+<h2 id="herencia-en-node">Herencia en Node.</h2>
+
+<p>Este código configura LDJClient para heredar de EventEmitter.</p>
+
+<p><img src="/capturas/captura_herencia.png" alt="ldj-client" /></p>
+
+<h2 id="eventos-de-datos-de-almacenamiento-en-buffer">Eventos de datos de almacenamiento en buffer.</h2>
+<pre><code class="language-Javascript">const EventEmitter = require ('events').EventEmitter;
+class LDJClient extends EventEmitter {
+  constructor(stream){
+    super();
+    let buffer = '';
+    stream.on('data', data =&gt; {
+        buffer += data;
+        let boundary = buffer.indexOf('\n');
+        while(boundary !== -1) {
+          const input = buffer.substring(0, boundary);
+          buffer = buffer.substring(boundary + 1);
+                this.emit('message', JSON.parse(input)); 
+          boundary = buffer.indexOf('\n');
+      }
+    });
+  }
+}
+</code></pre>
+
+<h2 id="exportando-funcionalidad-en-un-módulo">Exportando funcionalidad en un módulo</h2>
+
+<pre><code class="language-Javascript">const EventEmitter = require ('events').EventEmitter;
+class LDJClient extends EventEmitter {
+  constructor(stream){
+    super();
+    let buffer = '';
+    stream.on('data', data =&gt; {
+        buffer += data;
+        let boundary = buffer.indexOf('\n');
+        while(boundary !== -1) {
+          const input = buffer.substring(0, boundary);
+          buffer = buffer.substring(boundary + 1);
+                this.emit('message', JSON.parse(input)); 
+          boundary = buffer.indexOf('\n');
+          }
+        });
+  }
+  static connect(stream) {
+    return new LDJClient(stream);
+  }
+}
+/* Exporta la clase LDJClient*/
+module.exports = LDJClient;
+
+</code></pre>
+
+<p>Dentro de la definición de clase, después del constructor, estamos agregando un método estático llamado <code class="highlighter-rouge">connect</code>.</p>
+
+<p>El código para usar el módulo sería algo como esto</p>
+
+<p><img src="/capturas/captura_export1.png" alt="libreria" /></p>
+
+<p>O podríamos usar el método <code class="highlighter-rouge">connect</code>.</p>
+
+<p><img src="/capturas/captura_export2.png" alt="lib-connect" /></p>
+
+<h2 id="importando-un-módulo-nodejs">Importando un módulo Node.js</h2>
+
+<pre><code class="language-Javascript">'use strict';
+
+/*Empleamos la clase LDJClient que hemos creado para conectarnos*/
+const netClient = require('net').connect({port: 60300});
+const ldjClient = require('./lib/ldj-client.js').connect(netClient);
+
+/*Escuchamos si recibimos un mensaje y lo procesamos**/
+ldjClient.on('message', message =&gt; {
+  if(message.type === 'watching') {
+    console.log(`Now watching: ${message.file}`);
+  } else if (message.type === 'changed') {
+    console.log(`File changed: ${new Date(message.timestamp)}`);
+  } else {
+    throw Error(`Unrecognized message type: ${message.type}`);
+  }
+});
+</code></pre>
+
+<p>La principal diferencia respecto a lo anterior es que, en lugar de enviar buffers de datos directamente a JSON.parse , este programa se basa en el módulo ldj-client para producir eventos de mensajes .</p>
+
+<p>Ejecutamos el servidor de pruebas y el nuevo cliente.</p>
+
+<p><img src="/capturas/captura_import.png" alt="prueba" /></p>
+
+<h2 id="desarrollando-pruebas-con-mocha">Desarrollando pruebas con Mocha.</h2>
+
+<p>Mocha es un marco de pruebas para <code class="highlighter-rouge">Node</code>.  Lo instalamos con <code class="highlighter-rouge">npm</code> y desarrollamos diferentes pruebas para <code class="highlighter-rouge">LDJClient</code>.</p>
+
+<h2 id="instalación-de-mocha">Instalación de Mocha.</h2>
+
+<ul>
+  <li>En la carpeta <code class="highlighter-rouge">networking</code> generamos un JSON con <code class="highlighter-rouge">npm init -y</code>.</li>
+  <li>Posteriormente instalamos mocha con <code class="highlighter-rouge">npm install --save-dev --save-exact mocha@3.4.2</code>.</li>
+</ul>
+
+<p>Se habrá creado un directorio llamado <code class="highlighter-rouge">node_modules</code> que contiene <code class="highlighter-rouge">mocha</code> y sus dependencias.</p>
+
+<p>Además, el fichero <code class="highlighter-rouge">package.json</code> contiene ahora una linea de dependencia de <code class="highlighter-rouge">mocha</code>.</p>
+
+<h2 id="test-con-mocha">Test con Mocha.</h2>
+
+<p>Creamos un subdirectorio llamado <code class="highlighter-rouge">test</code> que es donde por defecto <code class="highlighter-rouge">Mocha</code> buscará.</p>
+
+<p>Desarrollamos un fichero de pruebas</p>
+
+<p><img src="/capturas/test_mocha.png" alt="test1" /></p>
+
+<h2 id="ejecución">Ejecución.</h2>
+
+<p>Para poder ejecutar tenemos que añadir en el <code class="highlighter-rouge">package.json</code> lo siguiente en la sección <code class="highlighter-rouge">test</code></p>
+
+<pre><code class="language-Json">{
+  "name": "networking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "net-watcher-json-client.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "Mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "3.4.2"
+  }
+}
+</code></pre>
+
+<p>A continuación, ejecutamos con <code class="highlighter-rouge">npm test</code>.</p>
+
+<p><img src="/capturas/captura_ejecucion.png" alt="ejecucion" /></p>
+
+<h2 id="añadir-más-test-asíncronos">Añadir más test asíncronos.</h2>
+
+<p>Modificamos el <code class="highlighter-rouge">describe</code> de la siguiente manera</p>
+
+<pre><code class="language-Javascript">'use strict'
+
+const assert = require('assert');
+const EventEmitter = require('events').EventEmitter;
+const LDJClient = require('../lib/ldj-client.js');
+
+/** Método en el que se realiza un test unitario que envia un mensaje*/
+describe('LDJClient', () =&gt; {
+  let stream = null;
+  let client = null;
+
+  beforeEach(() =&gt; {
+    stream = new EventEmitter();
+    client = new LDJClient(stream);
+  });
+  
+  it('should emit a message event from a single data event', done =&gt; {
+    client.on('message', message =&gt; {
+      assert.deepEqual(message, {foo: 'bar'});
+      done();
+    });
+
+    stream.emit('data', '{"foo": "bar"}\n');
+    process.nextTick(() =&gt; stream.emit('data','"bar}\n"'));
+  });
+});
+
+</code></pre>
+
+<p>Esta prueba divide el mensaje en dos partes para ser emitidas por el <code class="highlighter-rouge">stream</code> uno después del otro.</p>
+
+<p>Si se quiere especificar un tiempo para un test puede usar el <code class="highlighter-rouge">timeout</code></p>
+
+<p><img src="/capturas/captura_time.png" alt="timeout" /></p>
+
+<h2 id="testability">Testability.</h2>
+
+<ul>
+  <li>Test que divide un mensaje en dos o más pedazos.</li>
+</ul>
+
+<pre><code class="language-Javascript">
+'use strict';
+const assert = require('assert');
+const EventEmitter = require('events').EventEmitter;
+const LDJClient = require('../lib/ldj-client.js');
+
+describe('LDJClient', () =&gt; {
+  let stream = null;
+  let client = null;
+
+    beforeEach(() =&gt; {
+      stream = new EventEmitter();
+      client = new LDJClient(stream);
+    });
+  it('should emit a message event from split data events', done =&gt; {
+    client.on('message', message =&gt; {
+      assert.deepEqual(message, {foo: 'bar'});
+      done();
+    });
+    stream.emit('data', '{"foo":"bar"}\n');
+    process.nextTick(() =&gt; stream.emit('data', '"bar"}\n'));
+  });
+});
+</code></pre>
+
+<ul>
+  <li>Test que pasa un objecto nulo y detecta el error.</li>
+</ul>
+
+<pre><code class="language-Javascript">
+'use strict';
+const assert = require('assert');
+const EventEmitter = require('events').EventEmitter;
+const LDJClient = require('../lib/ldj-client.js');
+
+describe('LDJClient', () =&gt; {
+  let stream = null;
+  let client = null;
+
+    beforeEach(() =&gt; {
+      stream = new EventEmitter();
+      client = new LDJClient(stream);
+    });
+  it('Error creating an object with null parameter', done =&gt; {
+      assert.throws( () =&gt; {new LDJClient(null);});
+      done();
+  });
+});
+</code></pre>
+
+<h2 id="robustness">Robustness.</h2>
+
+<ul>
+  <li>
+    <p>En caso de que el formato JSON que se reciba no sea adecuado el servidor se cerrará y el cliente verá la notificación del error.</p>
+  </li>
+  <li>
+    <p>Aquí tenemos un test para enviar y detectar el error de pasar un mensaje que no es JSON.
+```javascript
+const assert = require(‘assert’);
+const EventEmitter = require(‘events’).EventEmitter;
+const LDJClient = require(‘../lib/ldj-client.js’);</p>
+  </li>
+</ul>
+
+<p>/** Test unitario que envia un mensaje no JSON*/
+describe(‘LDJClient’, () =&gt; {
+  let stream = null;
+  let client = null;</p>
+
+<p>beforeEach(() =&gt; {
+    stream = new EventEmitter();
+    client = new LDJClient(stream);
+  });</p>
+
+<p>it(‘should throw a error message because its not a JSON text.’, done =&gt;   {  assert.throws( () =&gt; {
+      stream.emit(‘data’, ‘Not JSON message\n’);
+    });
+    done();
+  });
+});</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+
+
+* Si falta el último salto de linea lo que pasa es que se quedará esperando y nunca emitirá el mensaje. Para poder manejar esta situación implementamos un evento `close` que comprobará si existe o no un `\n` al final del JSON. En caso de no existir lanza el error o, en caso contrario, emite el mensaje.
+
+```Javascript
+const assert = require('assert');
+const EventEmitter = require('events').EventEmitter;
+const LDJClient = require('../lib/ldj-client.js');
+
+/** Test unitario que envia un mensaje sin salto de linea seguido de un evento close*/
+describe('LDJClient', () =&gt; {
+  let stream = null;
+  let client = null;
+
+  beforeEach(() =&gt; {
+    stream = new EventEmitter();
+    client = new LDJClient(stream);
+  });
+  
+  it('Without last new line and with close event', done =&gt; {
+    client.on('message', message =&gt; {
+      assert.deepEqual(message, {foo: 'bar'});
+      done();
+    });
+
+    stream.emit('data', '{"foo": "bar"}\n');
+    stream.emit('close');
+  });
+});
+</code></pre></div></div>
+
+
+  </div><a class="u-url" href="/jekyll/update/2020/03/21/README.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">p4-t2-networking-alu0101120645</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">p4-t2-networking-alu0101120645</li><li><a class="u-email" href="mailto:alu0101120645@ull.edu.es">alu0101120645@ull.edu.es</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/alu0101120645"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">alu0101120645</span></a></li><li><a href="https://www.twitter.com/jekyllrb"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">jekyllrb</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
