@@ -1,0 +1,51 @@
+---
+layout: post
+title:  "Instalación de Mocha."
+date:   2020-03-21 18:00:00 +0000
+categories: jekyll update
+---
+## Instalación de Mocha.
+
+* En la carpeta `networking` generamos un JSON con `npm init -y`.
+* Posteriormente instalamos mocha con `npm install --save-dev --save-exact mocha@3.4.2`.
+
+Se habrá creado un directorio llamado `node_modules` que contiene `mocha` y sus dependencias.
+
+Además, el fichero `package.json` contiene ahora una linea de dependencia de `mocha`.
+
+## Test con Mocha.
+
+Creamos un subdirectorio llamado `test` que es donde por defecto `Mocha` buscará.
+
+Desarrollamos un fichero de pruebas
+
+![test1](/capturas/test_mocha.png)
+
+## Ejecución.
+
+Para poder ejecutar tenemos que añadir en el `package.json` lo siguiente en la sección `test`
+
+```Json
+{
+  "name": "networking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "net-watcher-json-client.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "Mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "3.4.2"
+  }
+}
+```
+
+A continuación, ejecutamos con `npm test`.
+
+![ejecucion](/capturas/captura_ejecucion.png)

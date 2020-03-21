@@ -1,0 +1,33 @@
+---
+layout: post
+title:  "Enlace de un servidor a un puerto TCP"
+date:   2020-03-21 17:40:00 +0000
+categories: jekyll update
+---
+
+## Enlace de un servidor a un puerto `TCP`.
+
+La conexión de un `Socket TCP` consiste en dos puntos finales. Un punto final se une a un puerto numerado mientras que el otro se conecta a un puerto.
+
+Esto funciona como en los sistemas telefónicos. 
+
+En Node las operaciones de enlace y conexión son proporcionadas por el módulo `net`. 
+
+```Javascript
+
+'use strict';
+const
+net = require('net'),
+server= net.createServer(connection => {
+
+});
+server.listen(60300);
+
+```
+
+
+El método `net.createServer` coge una `callback` y devuelve un objeto servidor. La `callback` se invoca cuando se conecta otro punto. El parámetro de conexión es un objecto `Socket` que se puede usar para enviar y recibir datos.
+
+El método `server.listen` nos permite escuchar por el puerto indicado.
+
+![esquema](/capturas/captura_1.png)
